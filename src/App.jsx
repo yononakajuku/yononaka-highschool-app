@@ -81,9 +81,10 @@ export default function WebApp() {
 const isDetailPage = searchParams.get("view") === "details";
 
   const detailHousehold = searchParams.get("household");
-  const detailAdmission = searchParams.get("admission");
-  const detailYear = searchParams.get("year");
-  const detailCredits = searchParams.get("credits");
+const detailAdmission = searchParams.get("admission");
+const detailYear = searchParams.get("year");
+const detailCredits = searchParams.get("credits");
+const detailTransferMonth = searchParams.get("transferMonth");
 
   const [householdType, setHouseholdType] = useState(detailHousehold || "support");
   const [admissionType, setAdmissionType] = useState(detailAdmission || "new");
@@ -117,8 +118,9 @@ const isDetailPage = searchParams.get("view") === "details";
     return matched ? matched.value : transferMonthOptions[0]?.value || "";
   }, [currentMonth, transferMonthOptions]);
 
-  const [transferMonthValue, setTransferMonthValue] = useState(defaultTransferValue);
-
+const [transferMonthValue, setTransferMonthValue] = useState(
+  detailTransferMonth || defaultTransferValue
+);
   const newAdmissionOptions = [
     { value: "2027-04", label: "2027年4月入学" },
     { value: "2028-04", label: "2028年4月入学" },
@@ -633,7 +635,7 @@ const isDetailPage = searchParams.get("view") === "details";
               {isReadyToCalculate && !isDetailPage && (
                 <div className="mt-4 rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200">
                   <a
-  href={`/?view=details&household=${householdType}&admission=${admissionType}&year=${newAdmissionYear}&credits=${inputCredits}`}
+href={`/?view=details&household=${householdType}&admission=${admissionType}&year=${newAdmissionYear}&credits=${inputCredits}&transferMonth=${transferMonthValue}`}
   target="_blank"
   rel="noopener noreferrer"
   className="inline-flex w-full items-center justify-center rounded-2xl bg-sky-600 px-6 py-3 text-base font-semibold text-white shadow hover:bg-sky-700 transition"
