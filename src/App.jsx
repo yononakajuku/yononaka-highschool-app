@@ -77,8 +77,8 @@ function runSelfChecks() {
 runSelfChecks();
 
 export default function WebApp() {
-  const [householdType, setHouseholdType] = useState("");
-  const [admissionType, setAdmissionType] = useState("");
+  const [householdType, setHouseholdType] = useState("support");
+  const [admissionType, setAdmissionType] = useState("new");
   const [inputCredits, setInputCredits] = useState("");
   const [newAdmissionYear, setNewAdmissionYear] = useState("2027-04");
 
