@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Calculator, GraduationCap, School, Wallet } from "lucide-react";
 import { YONONAKA_FEES, YOYOGI_FEES } from "./config/fees";
 
@@ -216,7 +216,40 @@ export default function WebApp() {
         : "-";
 
   const yen = (value) => `${value.toLocaleString()} 円`;
+useEffect(() => {
+  const sendHeight = () => {
+    const height = document.documentElement.scrollHeight;
+    window.parent.postMessage({ height }, "*");
+  };
 
+  sendHeight();
+
+  const observer = new ResizeObserver(() => {
+    sendHeight();
+  });
+
+  if (document.body) {
+    observer.observe(document.body);
+  }
+
+  window.addEventListener("load", sendHeight);
+  window.addEventListener("resize", sendHeight);
+
+  return () => {
+    observer.disconnect();
+    window.removeEventListener("load", sendHeight);
+    window.removeEventListener("resize", sendHeight);
+  };
+}, [
+  householdType,
+  admissionType,
+  inputCredits,
+  newAdmissionYear,
+  transferMonthValue,
+  monthly,
+  graduationPlannedText,
+  yearlyData.length,
+]);
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 via-white to-slate-100 text-slate-900">
       <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
