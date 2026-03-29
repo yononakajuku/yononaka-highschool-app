@@ -1,0 +1,5 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "yononaka-highschool-simulator",
+  "compatibility_date": "2026-03-28"
+}

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Calculator, GraduationCap, School, Wallet } from "lucide-react";
+import { YONONAKA_FEES, YOYOGI_FEES } from "./config/fees";
 
 function buildPlan(admissionType, inputCredits) {
   if (admissionType === "new") return [25, 25, 25];
@@ -22,56 +23,25 @@ function buildPlan(admissionType, inputCredits) {
 }
 
 function getYoyogiBase(householdType, yearIndex) {
-  if (householdType === "support") {
-    return {
-      出願料: yearIndex === 0 ? 10000 : 0,
-      入学金: 0,
-      授業料: 0,
-      教科書代: 0,
-      登録料: 0,
-      諸雑費: 0,
-      学級費: 0,
-      年間保険料: 0,
-      スクーリング費用: 0,
-    };
-  }
+  const baseFees = YOYOGI_FEES[householdType] || YOYOGI_FEES.general;
 
   return {
-    出願料: yearIndex === 0 ? 10000 : 0,
-    入学金: yearIndex === 0 ? 10000 : 0,
-    授業料: 0,
-    教科書代: 12000,
-    登録料: 3000,
-    諸雑費: 3000,
-    学級費: 0,
-    年間保険料: 0,
-    スクーリング費用: 20000,
+    ...baseFees,
+    出願料: yearIndex === 0 ? baseFees.出願料 : 0,
+    入学金: yearIndex === 0 ? baseFees.入学金 : 0,
   };
 }
 
-function getYononakaBase(householdType) {
-  if (householdType === "support") {
-    return {
-      入学金: 0,
-      教科書代: 0,
-      登録料: 0,
-      諸雑費: 1500,
-      学級費: 18000,
-      年間保険料: 550,
-      スクーリング費用: 20000,
-      賛助会員費: 3000,
-    };
-  }
-
+function getYononakaBase() {
   return {
-    入学金: 0,
-    教科書代: 0,
-    登録料: 0,
-    諸雑費: 1500,
-    学級費: 18000,
-    年間保険料: 550,
-    スクーリング費用: 0,
-    賛助会員費: 3000,
+    入学金: YONONAKA_FEES.入学金,
+    教科書代: YONONAKA_FEES.教科書代,
+    登録料: YONONAKA_FEES.登録料,
+    諸雑費: YONONAKA_FEES.諸雑費,
+    学級費: YONONAKA_FEES.学級費,
+    年間保険料: YONONAKA_FEES.年間保険料,
+    スクーリング費用: YONONAKA_FEES.スクーリング費用,
+    賛助会員費: YONONAKA_FEES.賛助会員費,
   };
 }
 
@@ -80,13 +50,28 @@ function sumValues(obj) {
 }
 
 function runSelfChecks() {
-  console.assert(JSON.stringify(buildPlan("new", "")) === JSON.stringify([25, 25, 25]), "新入学は25単位ずつ3年");
-  console.assert(JSON.stringify(buildPlan("transfer", "20")) === JSON.stringify([28, 27]), "転入55単位は28・27");
-  console.assert(JSON.stringify(buildPlan("transfer", "1")) === JSON.stringify([25, 25, 24]), "転入74単位は25・25・24");
-  console.assert(JSON.stringify(buildPlan("transfer", "50")) === JSON.stringify([25]), "転入25単位は1年");
-  console.assert((31 > 30 ? (31 - 30) * 8000 : 0) === 8000, "代々木の加算は30単位超過分のみ");
+  console.assert(
+    JSON.stringify(buildPlan("new", "")) === JSON.stringify([25, 25, 25]),
+    "新入学は25単位ずつ3年",
+  );
+  console.assert(
+    JSON.stringify(buildPlan("transfer", "20")) === JSON.stringify([28, 27]),
+    "転入55単位は28・27",
+  );
+  console.assert(
+    JSON.stringify(buildPlan("transfer", "1")) === JSON.stringify([25, 25, 24]),
+    "転入74単位は25・25・24",
+  );
+  console.assert(
+    JSON.stringify(buildPlan("transfer", "50")) === JSON.stringify([25]),
+    "転入25単位は1年",
+  );
+  console.assert(
+    (31 > 30 ? (31 - 30) * YOYOGI_FEES.超過単位単価 : 0) === 8000,
+    "代々木の加算は30単位超過分のみ",
+  );
   console.assert(getYoyogiBase("general", 1).入学金 === 0, "代々木高校の入学金は1年目のみ");
-  console.assert(getYononakaBase("general").登録料 === 0, "よのなか塾高等学院の登録料は0円");
+  console.assert(getYononakaBase().登録料 === 0, "よのなか塾高等学院の登録料は0円");
 }
 
 runSelfChecks();
@@ -163,29 +148,32 @@ export default function WebApp() {
 
   const householdLabel =
     householdType === "general"
-      ? "一般世帯"
+      ? "課税世帯"
       : householdType === "support"
-        ? "生活保護・非課税世帯"
+        ? "非課税・生活保護世帯"
         : "未選択";
 
   const admissionLabel =
     admissionType === "new"
       ? "中学校からの新入学"
       : admissionType === "transfer"
-        ? "他校からの転入"
+        ? "他高校からの転入"
         : "未選択";
 
-  const transferMonthLabel = transferMonthOptions.find((option) => option.value === transferMonthValue)?.label || "未選択";
-  const newAdmissionLabel = newAdmissionOptions.find((option) => option.value === newAdmissionYear)?.label || "未選択";
+  const transferMonthLabel =
+    transferMonthOptions.find((option) => option.value === transferMonthValue)?.label || "未選択";
+  const newAdmissionLabel =
+    newAdmissionOptions.find((option) => option.value === newAdmissionYear)?.label || "未選択";
 
   const yearlyData = useMemo(() => {
     if (!isReadyToCalculate) return [];
 
     return units.map((unitCount, yearIndex) => {
       const yoyogiBase = getYoyogiBase(householdType, yearIndex);
-      const yononakaBase = getYononakaBase(householdType);
-      const yoyogiExtra = unitCount > 30 ? (unitCount - 30) * 8000 : 0;
-      const yonoTuition = unitCount * 11000;
+      const yononakaBase = getYononakaBase();
+      const yoyogiExtra =
+        unitCount > 30 ? (unitCount - 30) * YOYOGI_FEES.超過単位単価 : 0;
+      const yonoTuition = unitCount * YONONAKA_FEES.単位単価;
       const total = sumValues(yoyogiBase) + sumValues(yononakaBase) + yoyogiExtra + yonoTuition;
 
       return {
@@ -204,6 +192,10 @@ export default function WebApp() {
     (sum, year) => sum + sumValues(year.yononakaBase) + year.yonoTuition,
     0,
   );
+  const yoyogiGrandTotal = yearlyData.reduce(
+    (sum, year) => sum + sumValues(year.yoyogiBase) + year.yoyogiExtra,
+    0,
+  );
 
   const monthsUntilGraduation =
     admissionType === "transfer" && transferTiming
@@ -212,7 +204,9 @@ export default function WebApp() {
         ? 36
         : 0;
 
-  const monthly = monthsUntilGraduation ? Math.ceil(yononakaGrandTotal / monthsUntilGraduation) : 0;
+  const monthly = monthsUntilGraduation
+    ? Math.ceil((yononakaGrandTotal + yoyogiGrandTotal) / monthsUntilGraduation)
+    : 0;
 
   const graduationPlannedText =
     admissionType === "transfer" && transferTiming
@@ -231,9 +225,11 @@ export default function WebApp() {
             <div>
               <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-sm backdrop-blur">
                 <GraduationCap className="h-4 w-4" />
-                授業料シミュレーター
+                卒業までのシミュレーション
               </div>
-              <h1 className="text-3xl font-bold leading-tight sm:text-4xl">卒業予定年月と授業料の概算</h1>
+              <h1 className="text-3xl font-bold leading-tight sm:text-4xl">
+                卒業予定年月と授業料の概算
+              </h1>
               <p className="mt-4 max-w-2xl text-sm leading-6 text-white/90 sm:text-base">
                 指定の制服・カバン・靴・タブレット・体操服などはなく購入不要です。修学旅行の積立もありません
               </p>
@@ -276,8 +272,8 @@ export default function WebApp() {
                 <Calculator className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-xl font-bold">条件を入力</h2>
-                <p className="text-sm text-slate-500">スマホでも押しやすい大きめボタンにしています</p>
+                <h2 className="text-xl font-bold">条件を入力してください</h2>
+                <p className="text-sm text-slate-500">入力後、卒業予定年月や授業料概算が表示されます</p>
               </div>
             </div>
 
@@ -293,7 +289,7 @@ export default function WebApp() {
                         : "border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50"
                     }`}
                   >
-                    一般世帯
+                    課税世帯
                   </button>
 
                   <button
@@ -304,7 +300,7 @@ export default function WebApp() {
                         : "border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50"
                     }`}
                   >
-                    生活保護・非課税世帯
+                    非課税・生活保護世帯
                   </button>
                 </div>
               </div>
@@ -320,9 +316,9 @@ export default function WebApp() {
                         : "border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50"
                     }`}
                   >
-                    <div className="font-semibold">他校からの転入</div>
+                    <div className="font-semibold">他高校からの転入</div>
                     <div className={`mt-1 text-sm ${admissionType === "transfer" ? "text-white/90" : "text-slate-500"}`}>
-                      75単位から取得済み単位を差し引く
+                      75単位から取得済み単位を差し引きます
                     </div>
                   </button>
 
@@ -339,7 +335,7 @@ export default function WebApp() {
                   >
                     <div className="font-semibold">中学校からの新入学</div>
                     <div className={`mt-1 text-sm ${admissionType === "new" ? "text-white/90" : "text-slate-500"}`}>
-                      25単位 × 3年で計算
+                      25単位 × 3年
                     </div>
                   </button>
                 </div>
@@ -404,7 +400,6 @@ export default function WebApp() {
           <section className="space-y-4">
             <div>
               <div className="grid gap-4 sm:grid-cols-2">
-                {/* 総額目安カードは非表示 */}
                 {false && (
                   <div className="rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200">
                     <div className="flex items-center gap-3">
@@ -427,6 +422,7 @@ export default function WebApp() {
                     <div>
                       <div className="text-sm text-slate-500">月額目安</div>
                       <div className="text-2xl font-bold">{isReadyToCalculate ? yen(monthly) : "-"}</div>
+                      <p className="mt-2 text-xs text-slate-400">卒業までの月数で割った金額です</p>
                     </div>
                   </div>
                 </div>
@@ -449,7 +445,7 @@ export default function WebApp() {
                   </div>
                 </div>
               </div>
-              <p className="mt-2 text-xs text-slate-400">卒業までの月数で割った金額です</p>
+              
             </div>
 
             {!isReadyToCalculate && (
@@ -498,6 +494,18 @@ export default function WebApp() {
                         </div>
                       )}
                     </div>
+
+{i === 0 && householdType === "general" && (
+  <div className="mt-3 rounded-xl bg-amber-50 border border-amber-200 p-3">
+    <div className="text-[10px] leading-relaxed text-amber-700">
+      ※課税世帯の場合、代々木高校の1年目の学費(300,000円)は一旦全額お支払いいただき、卒業時に返金されます
+    </div>
+  </div>
+)}
+
+
+
+
                   </div>
 
                   <div className="rounded-2xl bg-slate-50 p-4">
