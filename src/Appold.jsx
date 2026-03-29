@@ -77,18 +77,10 @@ function runSelfChecks() {
 runSelfChecks();
 
 export default function WebApp() {
-  const searchParams = new URLSearchParams(window.location.search);
-const isDetailPage = searchParams.get("view") === "details";
-
-  const detailHousehold = searchParams.get("household");
-  const detailAdmission = searchParams.get("admission");
-  const detailYear = searchParams.get("year");
-  const detailCredits = searchParams.get("credits");
-
-  const [householdType, setHouseholdType] = useState(detailHousehold || "support");
-  const [admissionType, setAdmissionType] = useState(detailAdmission || "new");
-  const [inputCredits, setInputCredits] = useState(detailCredits || "");
-  const [newAdmissionYear, setNewAdmissionYear] = useState(detailYear || "2027-04");
+  const [householdType, setHouseholdType] = useState("support");
+  const [admissionType, setAdmissionType] = useState("new");
+  const [inputCredits, setInputCredits] = useState("");
+  const [newAdmissionYear, setNewAdmissionYear] = useState("2027-04");
 
   const now = new Date();
   const currentMonth = now.getMonth() + 1;
@@ -224,148 +216,40 @@ const isDetailPage = searchParams.get("view") === "details";
         : "-";
 
   const yen = (value) => `${value.toLocaleString()} 円`;
+useEffect(() => {
+  const sendHeight = () => {
+    const height = document.documentElement.scrollHeight;
+    window.parent.postMessage({ height }, "*");
+  };
 
-  useEffect(() => {
-    const sendHeight = () => {
-      const height = document.documentElement.scrollHeight;
-      window.parent.postMessage({ height }, "*");
-    };
+  sendHeight();
 
+  const observer = new ResizeObserver(() => {
     sendHeight();
+  });
 
-    const observer = new ResizeObserver(() => {
-      sendHeight();
-    });
-
-    if (document.body) {
-      observer.observe(document.body);
-    }
-
-    window.addEventListener("load", sendHeight);
-    window.addEventListener("resize", sendHeight);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("load", sendHeight);
-      window.removeEventListener("resize", sendHeight);
-    };
-  }, [
-    householdType,
-    admissionType,
-    inputCredits,
-    newAdmissionYear,
-    transferMonthValue,
-    monthly,
-    graduationPlannedText,
-    yearlyData.length,
-  ]);
-
-  if (isDetailPage) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-sky-50 via-white to-slate-100 text-slate-900">
-        <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
-          <div className="mb-6">
-            <button
-              onClick={() => {
-                window.close();
-                window.history.back();
-              }}
-              className="rounded-xl bg-slate-200 px-4 py-2 text-sm text-slate-700 hover:bg-slate-300 transition"
-            >
-              ← 元のページに戻る
-            </button>
-          </div>
-
-          <div className="mb-6 rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200 sm:p-6">
-            <h1 className="text-2xl font-bold text-slate-900">学費明細</h1>
-            <p className="mt-2 text-sm text-slate-500">各年度ごとの明細を表示しています</p>
-          </div>
-
-          <div className="space-y-4">
-            {yearlyData.map((year, i) => (
-              <div key={i} className="rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200 sm:p-6">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <div className="text-lg font-bold text-slate-800">{i + 1}年目</div>
-                  <div className="text-sm font-semibold text-slate-600">{yen(year.total)} / {year.u}単位</div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="rounded-2xl bg-slate-50 p-4">
-                    <div className="mb-3 font-semibold">代々木高校</div>
-                    <div className="space-y-2 text-sm text-slate-600">
-                      {Object.entries(year.yoyogiBase).map(([key, value]) => (
-                        <div key={key} className="flex items-center justify-between gap-4">
-                          <span>{key === "授業料" ? "授業料(就学支援金適用後)" : key}</span>
-                          <span>{yen(value || 0)}</span>
-                        </div>
-                      ))}
-                      {year.yoyogiExtra > 0 && (
-                        <div className="flex items-center justify-between gap-4 border-t border-slate-200 pt-2 font-medium text-slate-700">
-                          <span>30単位超過分加算</span>
-                          <span>{yen(year.yoyogiExtra)}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {i === 0 && householdType === "general" && (
-                      <div className="mt-3 rounded-xl bg-amber-50 border border-amber-200 p-3">
-                        <div className="text-[10px] leading-relaxed text-amber-700">
-                          ※課税世帯の場合、代々木高校の1年目の学費(300,000円)は一旦全額お支払いいただき、卒業時に返金されます
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="rounded-2xl bg-slate-50 p-4">
-                    <div className="mb-3 font-semibold">よのなか塾高等学院</div>
-                    <div className="space-y-2 text-sm text-slate-600">
-                      <div className="flex items-center justify-between gap-4">
-                        <span>入学金</span>
-                        <span>{yen(year.yononakaBase.入学金 || 0)}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-4 font-medium text-slate-700">
-                        <span>授業料</span>
-                        <span>{yen(year.yonoTuition)}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-4">
-                        <span>教科書代</span>
-                        <span>{yen(year.yononakaBase.教科書代 || 0)}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-4">
-                        <span>登録料</span>
-                        <span>{yen(year.yononakaBase.登録料 || 0)}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-4">
-                        <span>諸雑費</span>
-                        <span>{yen(year.yononakaBase.諸雑費 || 0)}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-4">
-                        <span>学級費</span>
-                        <span>{yen(year.yononakaBase.学級費 || 0)}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-4">
-                        <span>年間保険料</span>
-                        <span>{yen(year.yononakaBase.年間保険料 || 0)}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-4">
-                        <span>スクーリング費用</span>
-                        <span>{yen(year.yononakaBase.スクーリング費用 || 0)}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-4">
-                        <span>賛助会員費</span>
-                        <span>{yen(year.yononakaBase.賛助会員費 || 0)}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+  if (document.body) {
+    observer.observe(document.body);
   }
 
+  window.addEventListener("load", sendHeight);
+  window.addEventListener("resize", sendHeight);
+
+  return () => {
+    observer.disconnect();
+    window.removeEventListener("load", sendHeight);
+    window.removeEventListener("resize", sendHeight);
+  };
+}, [
+  householdType,
+  admissionType,
+  inputCredits,
+  newAdmissionYear,
+  transferMonthValue,
+  monthly,
+  graduationPlannedText,
+  yearlyData.length,
+]);
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 via-white to-slate-100 text-slate-900">
       <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
@@ -594,19 +478,7 @@ const isDetailPage = searchParams.get("view") === "details";
                   </div>
                 </div>
               </div>
-
-              {isReadyToCalculate && !isDetailPage && (
-                <div className="mt-4 rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200">
-                  <a
-  href={`/?view=details&household=${householdType}&admission=${admissionType}&year=${newAdmissionYear}&credits=${inputCredits}`}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="inline-flex w-full items-center justify-center rounded-2xl bg-sky-600 px-6 py-3 text-base font-semibold text-white shadow hover:bg-sky-700 transition"
->
-  明細を見る
-</a>
-                </div>
-              )}
+              
             </div>
 
             {!isReadyToCalculate && (
@@ -630,6 +502,89 @@ const isDetailPage = searchParams.get("view") === "details";
                 </div>
               </div>
             )}
+
+            {yearlyData.map((year, i) => (
+              <div key={i} className="rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200 sm:p-6">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div className="text-lg font-bold text-slate-800">{i + 1}年目</div>
+                  <div className="text-sm font-semibold text-slate-600">{yen(year.total)} / {year.u}単位</div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="rounded-2xl bg-slate-50 p-4">
+                    <div className="mb-3 font-semibold">代々木高校</div>
+                    <div className="space-y-2 text-sm text-slate-600">
+                      {Object.entries(year.yoyogiBase).map(([key, value]) => (
+                        <div key={key} className="flex items-center justify-between gap-4">
+                          <span>{key === "授業料" ? "授業料(就学支援金適用後)" : key}</span>
+                          <span>{yen(value || 0)}</span>
+                        </div>
+                      ))}
+                      {year.yoyogiExtra > 0 && (
+                        <div className="flex items-center justify-between gap-4 border-t border-slate-200 pt-2 font-medium text-slate-700">
+                          <span>30単位超過分加算</span>
+                          <span>{yen(year.yoyogiExtra)}</span>
+                        </div>
+                      )}
+                    </div>
+
+{i === 0 && householdType === "general" && (
+  <div className="mt-3 rounded-xl bg-amber-50 border border-amber-200 p-3">
+    <div className="text-[10px] leading-relaxed text-amber-700">
+      ※課税世帯の場合、代々木高校の1年目の学費(300,000円)は一旦全額お支払いいただき、卒業時に返金されます
+    </div>
+  </div>
+)}
+
+
+
+
+                  </div>
+
+                  <div className="rounded-2xl bg-slate-50 p-4">
+                    <div className="mb-3 font-semibold">よのなか塾高等学院</div>
+                    <div className="space-y-2 text-sm text-slate-600">
+                      <div className="flex items-center justify-between gap-4">
+                        <span>入学金</span>
+                        <span>{yen(year.yononakaBase.入学金 || 0)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4 font-medium text-slate-700">
+                        <span>授業料</span>
+                        <span>{yen(year.yonoTuition)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4">
+                        <span>教科書代</span>
+                        <span>{yen(year.yononakaBase.教科書代 || 0)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4">
+                        <span>登録料</span>
+                        <span>{yen(year.yononakaBase.登録料 || 0)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4">
+                        <span>諸雑費</span>
+                        <span>{yen(year.yononakaBase.諸雑費 || 0)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4">
+                        <span>学級費</span>
+                        <span>{yen(year.yononakaBase.学級費 || 0)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4">
+                        <span>年間保険料</span>
+                        <span>{yen(year.yononakaBase.年間保険料 || 0)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4">
+                        <span>スクーリング費用</span>
+                        <span>{yen(year.yononakaBase.スクーリング費用 || 0)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4">
+                        <span>賛助会員費</span>
+                        <span>{yen(year.yononakaBase.賛助会員費 || 0)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </section>
         </div>
       </div>
