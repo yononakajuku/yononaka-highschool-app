@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Calculator, GraduationCap, School, Wallet } from "lucide-react";
+import { Calculator, GraduationCap, School, Wallet, Calendar } from "lucide-react";
 import { YONONAKA_FEES, YOYOGI_FEES } from "./config/fees";
 
 function buildPlan(admissionType, inputCredits) {
@@ -281,6 +281,24 @@ const [transferMonthValue, setTransferMonthValue] = useState(
           <div className="mb-6 rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200 sm:p-6">
             <h1 className="text-2xl font-bold text-slate-900">学費明細</h1>
             <p className="mt-2 text-sm text-slate-500">各年度ごとの明細を表示しています</p>
+            <a
+  href="https://www.jicoo.com/t/yononaka/e/highschool"
+  rel="noopener noreferrer"
+  className="mt-6 block rounded-[28px] bg-sky-50 p-5 shadow-lg ring-1 ring-sky-200 transition hover:shadow-xl"
+>
+  <div className="flex items-center gap-3">
+    <div className="rounded-2xl bg-sky-100 p-3 text-sky-700">
+      <Calendar className="h-5 w-5" />
+    </div>
+
+    <div>
+      <div className="text-sm text-slate-500">相談・見学</div>
+      <div className="text-lg font-bold text-slate-800">
+        個別相談・見学を予約する
+      </div>
+    </div>
+  </div>
+</a>
           </div>
 　　　　　　　<div className="grid gap-4 sm:grid-cols-2 mb-4">
   {/* 月額目安 */}
