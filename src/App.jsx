@@ -280,7 +280,42 @@ const isDetailPage = searchParams.get("view") === "details";
             <h1 className="text-2xl font-bold text-slate-900">学費明細</h1>
             <p className="mt-2 text-sm text-slate-500">各年度ごとの明細を表示しています</p>
           </div>
+　　　　　　　<div className="grid gap-4 sm:grid-cols-2 mb-4">
+  {/* 月額目安 */}
+  <div className="rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200">
+    <div className="flex items-center gap-3">
+      <div className="rounded-2xl bg-violet-100 p-3 text-violet-700">
+        <School className="h-5 w-5" />
+      </div>
+      <div>
+        <div className="text-sm text-slate-500">月額目安</div>
+        <div className="text-2xl font-bold">{yen(monthly)}</div>
+        <p className="mt-2 text-xs text-slate-400">
+          卒業までの月数で割った金額です
+        </p>
+      </div>
+    </div>
+  </div>
 
+  {/* 卒業までの目安 */}
+  <div className="rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200">
+    <div className="flex items-center gap-3">
+      <div className="rounded-2xl bg-amber-100 p-3 text-amber-700">
+        <GraduationCap className="h-5 w-5" />
+      </div>
+      <div>
+        <div className="text-sm text-slate-500">卒業までの目安</div>
+        <div className="text-2xl font-bold">
+          {admissionType === "transfer" && transferTiming
+            ? `${transferTiming.years}年 ${transferTiming.months}ヶ月`
+            : admissionType === "new"
+              ? "3年"
+              : "-"}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
           <div className="space-y-4">
             {yearlyData.map((year, i) => (
               <div key={i} className="rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200 sm:p-6">
