@@ -308,6 +308,11 @@ const [transferMonthValue, setTransferMonthValue] = useState(
       <div>
         <div className="text-sm text-slate-500">卒業までの目安</div>
         <div className="text-2xl font-bold">
+          {admissionType === "transfer" && transferTiming && (
+  <div className="mt-2 text-xs text-slate-500 leading-relaxed">
+    {transferMonthLabel} に転入した場合、{transferTiming.graduationYear}年3月卒業見込みです。
+  </div>
+)}
           {admissionType === "transfer" && transferTiming
             ? `${transferTiming.years}年 ${transferTiming.months}ヶ月`
             : admissionType === "new"
@@ -654,19 +659,7 @@ href={`/?view=details&household=${householdType}&admission=${admissionType}&year
               </div>
             )}
 
-            {admissionType === "transfer" && transferTiming && isReadyToCalculate && (
-              <div className="rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200 sm:p-6">
-                <h3 className="text-lg font-bold">卒業までの目安</h3>
-                <div className="mt-3 rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
-                  <div className="font-semibold text-slate-800">
-                    残り {transferTiming.years}年 {transferTiming.months}ヶ月 で卒業予定
-                  </div>
-                  <div className="mt-1 text-slate-500">
-                    {transferMonthLabel} に転入した場合、{transferTiming.graduationYear}年3月卒業見込みです。
-                  </div>
-                </div>
-              </div>
-            )}
+           
           </section>
         </div>
       </div>
