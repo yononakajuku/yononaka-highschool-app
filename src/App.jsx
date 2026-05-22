@@ -78,13 +78,13 @@ runSelfChecks();
 
 export default function WebApp() {
   const searchParams = new URLSearchParams(window.location.search);
-const isDetailPage = searchParams.get("view") === "details";
+  const isDetailPage = searchParams.get("view") === "details";
 
   const detailHousehold = searchParams.get("household");
-const detailAdmission = searchParams.get("admission");
-const detailYear = searchParams.get("year");
-const detailCredits = searchParams.get("credits");
-const detailTransferMonth = searchParams.get("transferMonth");
+  const detailAdmission = searchParams.get("admission");
+  const detailYear = searchParams.get("year");
+  const detailCredits = searchParams.get("credits");
+  const detailTransferMonth = searchParams.get("transferMonth");
 
   const [householdType, setHouseholdType] = useState(detailHousehold || "support");
   const [admissionType, setAdmissionType] = useState(detailAdmission || "new");
@@ -118,9 +118,9 @@ const detailTransferMonth = searchParams.get("transferMonth");
     return matched ? matched.value : transferMonthOptions[0]?.value || "";
   }, [currentMonth, transferMonthOptions]);
 
-const [transferMonthValue, setTransferMonthValue] = useState(
-  detailTransferMonth || defaultTransferValue
-);
+  const [transferMonthValue, setTransferMonthValue] = useState(
+    detailTransferMonth || defaultTransferValue
+  );
   const newAdmissionOptions = [
     { value: "2027-04", label: "2027年4月入学" },
     { value: "2028-04", label: "2028年4月入学" },
@@ -227,6 +227,37 @@ const [transferMonthValue, setTransferMonthValue] = useState(
 
   const yen = (value) => `${value.toLocaleString()} 円`;
 
+const GAS_URL =
+  "https://script.google.com/macros/s/AKfycbyQNMC4kfRGDm6ZHrE6O6iyujWc70hXD0WEX3H1hYSgjvLczEFdnCBDRMCZSxxoythS/exec";
+
+  const notifyUsage = async () => {
+    try {
+      await fetch(GAS_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8",
+        },
+        body: JSON.stringify({
+          household: householdLabel,
+          admission: admissionLabel,
+          monthly: yen(monthly),
+          graduation: graduationPlannedText,
+          credits: inputCredits || "-",
+          transferMonth: admissionType === "transfer" ? transferMonthLabel : "-",
+          newAdmission: admissionType === "new" ? newAdmissionLabel : "-",
+          total: yen(grandTotal),
+          yononakaTotal: yen(yononakaGrandTotal),
+          yoyogiTotal: yen(yoyogiGrandTotal),
+          pageUrl: window.location.href,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+    } catch (error) {
+      console.error("GAS通知送信エラー:", error);
+    }
+  };
+
   useEffect(() => {
     const sendHeight = () => {
       const height = document.documentElement.scrollHeight;
@@ -300,7 +331,7 @@ const [transferMonthValue, setTransferMonthValue] = useState(
   </div>
 </a>
           </div>
-　　　　　　　<div className="grid gap-4 sm:grid-cols-2 mb-4">
+          <div className="grid gap-4 sm:grid-cols-2 mb-4">
   {/* 月額目安 */}
   <div className="rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200">
     <div className="flex items-center gap-3">
@@ -661,6 +692,7 @@ const [transferMonthValue, setTransferMonthValue] = useState(
 href={`/?view=details&household=${householdType}&admission=${admissionType}&year=${newAdmissionYear}&credits=${inputCredits}&transferMonth=${transferMonthValue}`}
   target="_blank"
   rel="noopener noreferrer"
+  onClick={notifyUsage}
   className="inline-flex w-full items-center justify-center rounded-2xl bg-sky-600 px-6 py-3 text-base font-semibold text-white shadow hover:bg-sky-700 transition"
 >
   明細を見る
