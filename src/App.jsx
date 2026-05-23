@@ -279,33 +279,7 @@ const notifyUsage = async () => {
   }
 };
 
-  const notifyUsage = async () => {
-    try {
-      await fetch(GAS_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8",
-        },
-        body: JSON.stringify({
-          household: householdLabel,
-          admission: admissionLabel,
-          monthly: yen(monthly),
-          graduation: graduationPlannedText,
-          credits: inputCredits || "-",
-          transferMonth: admissionType === "transfer" ? transferMonthLabel : "-",
-          newAdmission: admissionType === "new" ? newAdmissionLabel : "-",
-          total: yen(grandTotal),
-          yononakaTotal: yen(yononakaGrandTotal),
-          yoyogiTotal: yen(yoyogiGrandTotal),
-          pageUrl: window.location.href,
-          timestamp: new Date().toISOString(),
-        }),
-      });
-    } catch (error) {
-      console.error("GAS通知送信エラー:", error);
-    }
-  };
+  
 
   useEffect(() => {
     const sendHeight = () => {
