@@ -230,6 +230,56 @@ export default function WebApp() {
 const GAS_URL =
   "https://script.google.com/macros/s/AKfycbyQNMC4kfRGDm6ZHrE6O6iyujWc70hXD0WEX3H1hYSgjvLczEFdnCBDRMCZSxxoythS/exec";
 
+  const GAS_URL =
+  "https://script.google.com/macros/s/XXXX/exec";
+
+const notifyUsage = async () => {
+  try {
+    const isMobile =
+      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+      window.innerWidth <= 768;
+
+    const deviceType = isMobile ? "スマホ" : "PC";
+
+    await fetch(GAS_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain",
+      },
+      body: JSON.stringify({
+        deviceType,
+        userAgent: navigator.userAgent,
+        screenWidth: window.innerWidth,
+        screenHeight: window.innerHeight,
+
+        pageUrl: window.location.href,
+        referrer: document.referrer || "直接アクセス",
+
+        household: householdLabel,
+        admission: admissionLabel,
+        monthly: yen(monthly),
+        graduation: graduationPlannedText,
+        credits: inputCredits || "未入力",
+        transferMonth:
+          admissionType === "transfer" ? transferMonthLabel : "対象外",
+        admissionYear:
+          admissionType === "new" ? newAdmissionLabel : "対象外",
+
+        total: yen(grandTotal),
+        yononakaTotal: yen(yononakaGrandTotal),
+        yoyogiTotal: yen(yoyogiGrandTotal),
+
+        timestamp: new Date().toLocaleString("ja-JP", {
+          timeZone: "Asia/Tokyo",
+        }),
+      }),
+    });
+  } catch (error) {
+    console.error("通知送信エラー:", error);
+  }
+};
+
   const notifyUsage = async () => {
     try {
       await fetch(GAS_URL, {
@@ -689,7 +739,7 @@ const GAS_URL =
               {isReadyToCalculate && !isDetailPage && (
                 <div className="mt-4 rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200">
                   <a
-href={`/?view=details&household=${householdType}&admission=${admissionType}&year=${newAdmissionYear}&credits=${inputCredits}&transferMonth=${transferMonthValue}`}
+  href={`/?view=details&household=${householdType}&admission=${admissionType}&year=${newAdmissionYear}&credits=${inputCredits}&transferMonth=${transferMonthValue}`}
   target="_blank"
   rel="noopener noreferrer"
   onClick={notifyUsage}
