@@ -230,8 +230,7 @@ export default function WebApp() {
 const GAS_URL =
   "https://script.google.com/macros/s/AKfycbyQNMC4kfRGDm6ZHrE6O6iyujWc70hXD0WEX3H1hYSgjvLczEFdnCBDRMCZSxxoythS/exec";
 
-  const GAS_URL =
-  "https://script.google.com/macros/s/XXXX/exec";
+  
 
 const notifyUsage = async () => {
   try {
