@@ -79,12 +79,10 @@ runSelfChecks();
 
 export default function WebApp() {
   const searchParams = new URLSearchParams(window.location.search);
-<<<<<<< HEAD
+
 
   // 学費明細ページは一旦非表示にします。
   // 将来復活したい場合に備えて、判定自体は残しています。
-=======
->>>>>>> 824fafe032593a15086e6b50245ed42e45acb725
   const isDetailPage = searchParams.get("view") === "details";
 
   const detailHousehold = searchParams.get("household");
@@ -127,14 +125,14 @@ export default function WebApp() {
   }, [currentMonth, transferMonthOptions]);
 
   const [transferMonthValue, setTransferMonthValue] = useState(
-<<<<<<< HEAD
+
     detailTransferMonth || defaultTransferValue,
   );
 
-=======
+
     detailTransferMonth || defaultTransferValue
   );
->>>>>>> 824fafe032593a15086e6b50245ed42e45acb725
+
   const newAdmissionOptions = [
     { value: "2027-04", label: "2027年4月入学" },
     { value: "2028-04", label: "2028年4月入学" },
@@ -287,7 +285,7 @@ export default function WebApp() {
       console.error("通知送信エラー:", error);
     }
   };
-=======
+
 const GAS_URL =
   "https://script.google.com/macros/s/AKfycbyQNMC4kfRGDm6ZHrE6O6iyujWc70hXD0WEX3H1hYSgjvLczEFdnCBDRMCZSxxoythS/exec";
 
@@ -341,7 +339,7 @@ const notifyUsage = async () => {
 };
 
   
->>>>>>> 824fafe032593a15086e6b50245ed42e45acb725
+
 
   useEffect(() => {
     const sendHeight = () => {
@@ -385,9 +383,9 @@ const notifyUsage = async () => {
   if (isDetailPage) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-sky-50 via-white to-slate-100 text-slate-900">
-<<<<<<< HEAD
+
         ...学費明細ページ...
-=======
+
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
           <div className="mb-6">
             <button
@@ -545,7 +543,7 @@ const notifyUsage = async () => {
             ))}
           </div>
         </div>
->>>>>>> 824fafe032593a15086e6b50245ed42e45acb725
+
       </div>
     );
   }
@@ -802,7 +800,7 @@ const notifyUsage = async () => {
                   >
                     明細を見る
                   </a>
-=======
+
   href={`/?view=details&household=${householdType}&admission=${admissionType}&year=${newAdmissionYear}&credits=${inputCredits}&transferMonth=${transferMonthValue}`}
   target="_blank"
   rel="noopener noreferrer"
@@ -811,7 +809,7 @@ const notifyUsage = async () => {
 >
   明細を見る
 </a>
->>>>>>> 824fafe032593a15086e6b50245ed42e45acb725
+
                 </div>
               )}
               */}
