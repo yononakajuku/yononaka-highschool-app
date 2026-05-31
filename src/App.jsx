@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { Calculator, GraduationCap, School, Wallet, Calendar } from "lucide-react";
+import { Calculator, GraduationCap } from "lucide-react";
+// 学費ロジックは将来復活できるよう、設定ファイルの import は残しています。
 import { YONONAKA_FEES, YOYOGI_FEES } from "./config/fees";
 
 function buildPlan(admissionType, inputCredits) {
@@ -78,6 +79,12 @@ runSelfChecks();
 
 export default function WebApp() {
   const searchParams = new URLSearchParams(window.location.search);
+<<<<<<< HEAD
+
+  // 学費明細ページは一旦非表示にします。
+  // 将来復活したい場合に備えて、判定自体は残しています。
+=======
+>>>>>>> 824fafe032593a15086e6b50245ed42e45acb725
   const isDetailPage = searchParams.get("view") === "details";
 
   const detailHousehold = searchParams.get("household");
@@ -86,6 +93,7 @@ export default function WebApp() {
   const detailCredits = searchParams.get("credits");
   const detailTransferMonth = searchParams.get("transferMonth");
 
+  // 世帯区分UIは非表示にしますが、学費ロジック復活用に state は残します。
   const [householdType, setHouseholdType] = useState(detailHousehold || "support");
   const [admissionType, setAdmissionType] = useState(detailAdmission || "new");
   const [inputCredits, setInputCredits] = useState(detailCredits || "");
@@ -119,14 +127,21 @@ export default function WebApp() {
   }, [currentMonth, transferMonthOptions]);
 
   const [transferMonthValue, setTransferMonthValue] = useState(
+<<<<<<< HEAD
+    detailTransferMonth || defaultTransferValue,
+  );
+
+=======
     detailTransferMonth || defaultTransferValue
   );
+>>>>>>> 824fafe032593a15086e6b50245ed42e45acb725
   const newAdmissionOptions = [
     { value: "2027-04", label: "2027年4月入学" },
     { value: "2028-04", label: "2028年4月入学" },
   ];
 
-  const isHouseholdSelected = householdType !== "";
+  // 世帯区分は画面上で選ばせないため、常に計算可能扱いにします。
+  const isHouseholdSelected = true;
   const isAdmissionSelected = admissionType !== "";
   const needsNewAdmissionYear = admissionType === "new";
   const needsTransferInputs = admissionType === "transfer";
@@ -175,6 +190,7 @@ export default function WebApp() {
   const newAdmissionLabel =
     newAdmissionOptions.find((option) => option.value === newAdmissionYear)?.label || "未選択";
 
+  // 学費計算ロジックは将来復活できるよう残しています。
   const yearlyData = useMemo(() => {
     if (!isReadyToCalculate) return [];
 
@@ -227,6 +243,51 @@ export default function WebApp() {
 
   const yen = (value) => `${value.toLocaleString()} 円`;
 
+<<<<<<< HEAD
+  const GAS_URL =
+    "https://script.google.com/macros/s/AKfycbyQNMC4kfRGDm6ZHrE6O6iyujWc70hXD0WEX3H1hYSgjvLczEFdnCBDRMCZSxxoythS/exec";
+
+  // 明細を見るボタンは非表示にしていますが、GAS通知ロジックは将来復活用に残しています。
+  const notifyUsage = async () => {
+    try {
+      const isMobile =
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+      const deviceType = isMobile ? "スマホ" : "PC";
+
+      await fetch(GAS_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "text/plain",
+        },
+        body: JSON.stringify({
+          deviceType,
+          userAgent: navigator.userAgent,
+          screenWidth: window.innerWidth,
+          screenHeight: window.innerHeight,
+          pageUrl: window.location.href,
+          referrer: document.referrer || "直接アクセス",
+          household: householdLabel,
+          admission: admissionLabel,
+          monthly: yen(monthly),
+          graduation: graduationPlannedText,
+          credits: inputCredits || "未入力",
+          transferMonth: admissionType === "transfer" ? transferMonthLabel : "対象外",
+          admissionYear: admissionType === "new" ? newAdmissionLabel : "対象外",
+          total: yen(grandTotal),
+          yononakaTotal: yen(yononakaGrandTotal),
+          yoyogiTotal: yen(yoyogiGrandTotal),
+          timestamp: new Date().toLocaleString("ja-JP", {
+            timeZone: "Asia/Tokyo",
+          }),
+        }),
+      });
+    } catch (error) {
+      console.error("通知送信エラー:", error);
+    }
+  };
+=======
 const GAS_URL =
   "https://script.google.com/macros/s/AKfycbyQNMC4kfRGDm6ZHrE6O6iyujWc70hXD0WEX3H1hYSgjvLczEFdnCBDRMCZSxxoythS/exec";
 
@@ -280,6 +341,7 @@ const notifyUsage = async () => {
 };
 
   
+>>>>>>> 824fafe032593a15086e6b50245ed42e45acb725
 
   useEffect(() => {
     const sendHeight = () => {
@@ -316,9 +378,16 @@ const notifyUsage = async () => {
     yearlyData.length,
   ]);
 
+  /*
+    学費明細ページは一旦非表示にします。
+    将来復活したい場合は、この if (isDetailPage) ブロックを戻します。
+
   if (isDetailPage) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-sky-50 via-white to-slate-100 text-slate-900">
+<<<<<<< HEAD
+        ...学費明細ページ...
+=======
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
           <div className="mb-6">
             <button
@@ -476,9 +545,11 @@ const notifyUsage = async () => {
             ))}
           </div>
         </div>
+>>>>>>> 824fafe032593a15086e6b50245ed42e45acb725
       </div>
     );
   }
+  */
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 via-white to-slate-100 text-slate-900">
@@ -491,20 +562,32 @@ const notifyUsage = async () => {
                 卒業までのシミュレーション
               </div>
               <h1 className="text-3xl font-bold leading-tight sm:text-4xl">
-                卒業予定年月と授業料の概算
+                卒業予定年月
               </h1>
+
+              {/*
+                ヘッダー説明文は一旦非表示。
+                将来必要になった場合は以下を戻します。
+
               <p className="mt-4 max-w-2xl text-sm leading-6 text-white/90 sm:text-base">
                 指定の制服・カバン・靴・タブレット・体操服などはなく購入不要です。修学旅行の積立もありません
               </p>
+              */}
             </div>
 
             <div className="rounded-3xl bg-white/15 p-5 backdrop-blur-md">
               <div className="text-sm text-white/80">現在の選択</div>
               <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {/*
+                  世帯区分は一旦非表示。
+                  学費版へ戻す場合は以下を戻します。
+
                 <div className="rounded-2xl bg-white/10 p-3">
                   <div className="text-xs text-white/70">世帯区分</div>
                   <div className="mt-1 font-semibold">{householdLabel}</div>
                 </div>
+                */}
+
                 <div className="rounded-2xl bg-white/10 p-3">
                   <div className="text-xs text-white/70">入学区分</div>
                   <div className="mt-1 font-semibold">{admissionLabel}</div>
@@ -519,7 +602,7 @@ const notifyUsage = async () => {
                         : "-"}
                   </div>
                 </div>
-                <div className="rounded-2xl bg-amber-300/90 p-3 text-slate-900 shadow-lg ring-1 ring-white/30">
+                <div className="rounded-2xl bg-amber-300/90 p-3 text-slate-900 shadow-lg ring-1 ring-white/30 sm:col-span-2">
                   <div className="text-xs text-slate-700">卒業予定年月</div>
                   <div className="mt-1 font-semibold">{graduationPlannedText}</div>
                 </div>
@@ -536,11 +619,15 @@ const notifyUsage = async () => {
               </div>
               <div>
                 <h2 className="text-xl font-bold">条件を入力してください</h2>
-                <p className="text-sm text-slate-500">入力後、卒業予定年月や授業料概算が表示されます</p>
+                <p className="text-sm text-slate-500">入力後、卒業予定年月が表示されます</p>
               </div>
             </div>
 
             <div className="space-y-6">
+              {/*
+                世帯区分選択は一旦非表示。
+                学費版へ戻す場合は以下を戻します。
+
               <div>
                 <label className="mb-3 block text-sm font-semibold text-slate-700">① 世帯区分</label>
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -567,9 +654,10 @@ const notifyUsage = async () => {
                   </button>
                 </div>
               </div>
+              */}
 
               <div>
-                <label className="mb-3 block text-sm font-semibold text-slate-700">② 入学区分</label>
+                <label className="mb-3 block text-sm font-semibold text-slate-700">① 入学区分</label>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <button
                     onClick={() => setAdmissionType("transfer")}
@@ -606,7 +694,7 @@ const notifyUsage = async () => {
 
               {needsNewAdmissionYear && (
                 <div>
-                  <label className="mb-3 block text-sm font-semibold text-slate-700">③ 入学年月</label>
+                  <label className="mb-3 block text-sm font-semibold text-slate-700">② 入学年月</label>
                   <select
                     value={newAdmissionYear}
                     onChange={(e) => setNewAdmissionYear(e.target.value)}
@@ -624,7 +712,7 @@ const notifyUsage = async () => {
               {needsTransferInputs && (
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="mb-3 block text-sm font-semibold text-slate-700">③ 転入月</label>
+                    <label className="mb-3 block text-sm font-semibold text-slate-700">② 転入月</label>
                     <select
                       value={transferMonthValue}
                       onChange={(e) => setTransferMonthValue(e.target.value)}
@@ -639,7 +727,7 @@ const notifyUsage = async () => {
                   </div>
 
                   <div>
-                    <label className="mb-3 block text-sm font-semibold text-slate-700">④ 取得済み単位数</label>
+                    <label className="mb-3 block text-sm font-semibold text-slate-700">③ 取得済み単位数</label>
                     <div className="relative">
                       <input
                         type="number"
@@ -661,50 +749,43 @@ const notifyUsage = async () => {
           </section>
 
           <section className="space-y-4">
-            <div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {false && (
-                  <div className="rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200">
-                    <div className="flex items-center gap-3">
-                      <div className="rounded-2xl bg-emerald-100 p-3 text-emerald-700">
-                        <Wallet className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <div className="text-sm text-slate-500">総額目安</div>
-                        <div className="text-2xl font-bold">{isReadyToCalculate ? yen(grandTotal) : "-"}</div>
-                      </div>
-                    </div>
+            <div className="grid gap-4 sm:grid-cols-1">
+              <div className="rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-2xl bg-amber-100 p-3 text-amber-700">
+                    <GraduationCap className="h-5 w-5" />
                   </div>
-                )}
-
-                <div className="rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-2xl bg-violet-100 p-3 text-violet-700">
-                      <School className="h-5 w-5" />
+                  <div>
+                    <div className="text-sm text-slate-500">卒業までの期間</div>
+                    <div className="text-2xl font-bold">
+                      {admissionType === "transfer" && transferTiming
+                        ? `${transferTiming.years}年 ${transferTiming.months}ヶ月`
+                        : admissionType === "new"
+                          ? "3年"
+                          : "-"}
                     </div>
-                    <div>
-                      <div className="text-sm text-slate-500">月額目安</div>
-                      <div className="text-2xl font-bold">{isReadyToCalculate ? yen(monthly) : "-"}</div>
-                      <p className="mt-2 text-xs text-slate-400">卒業までの月数で割った金額です</p>
-                    </div>
+                    {admissionType === "transfer" && transferTiming && (
+                      <div className="mt-2 text-xs text-slate-500 leading-relaxed">
+                        {transferMonthLabel} に転入した場合、{transferTiming.graduationYear}年3月卒業見込みです。
+                      </div>
+                    )}
                   </div>
                 </div>
+              </div>
 
-                <div className="rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-2xl bg-amber-100 p-3 text-amber-700">
-                      <GraduationCap className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <div className="text-sm text-slate-500">卒業までの目安</div>
-                      <div className="text-2xl font-bold">
-                        {admissionType === "transfer" && transferTiming
-                          ? `${transferTiming.years}年 ${transferTiming.months}ヶ月`
-                          : admissionType === "new"
-                            ? "3年"
-                            : "-"}
-                      </div>
-                    </div>
+              {/*
+                学費表示は一旦非表示。
+                将来復活する場合は以下を戻す。
+
+              <div className="rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-2xl bg-violet-100 p-3 text-violet-700">
+                    <School className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className="text-sm text-slate-500">月額目安</div>
+                    <div className="text-2xl font-bold">{isReadyToCalculate ? yen(monthly) : "-"}</div>
+                    <p className="mt-2 text-xs text-slate-400">卒業までの月数で割った金額です</p>
                   </div>
                 </div>
               </div>
@@ -712,6 +793,16 @@ const notifyUsage = async () => {
               {isReadyToCalculate && !isDetailPage && (
                 <div className="mt-4 rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200">
                   <a
+<<<<<<< HEAD
+                    href={`/?view=details&household=${householdType}&admission=${admissionType}&year=${newAdmissionYear}&credits=${inputCredits}&transferMonth=${transferMonthValue}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={notifyUsage}
+                    className="inline-flex w-full items-center justify-center rounded-2xl bg-sky-600 px-6 py-3 text-base font-semibold text-white shadow hover:bg-sky-700 transition"
+                  >
+                    明細を見る
+                  </a>
+=======
   href={`/?view=details&household=${householdType}&admission=${admissionType}&year=${newAdmissionYear}&credits=${inputCredits}&transferMonth=${transferMonthValue}`}
   target="_blank"
   rel="noopener noreferrer"
@@ -720,19 +811,19 @@ const notifyUsage = async () => {
 >
   明細を見る
 </a>
+>>>>>>> 824fafe032593a15086e6b50245ed42e45acb725
                 </div>
               )}
+              */}
             </div>
 
             {!isReadyToCalculate && (
               <div className="rounded-[28px] bg-white p-5 shadow-lg ring-1 ring-slate-200 sm:p-6">
                 <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
-                  世帯区分と入学区分を選択し、転入の場合は転入月と取得済み単位数を入力すると計算結果が表示されます。
+                  入学区分を選択し、転入の場合は転入月と取得済み単位数を入力すると卒業予定年月が表示されます。
                 </div>
               </div>
             )}
-
-           
           </section>
         </div>
       </div>
